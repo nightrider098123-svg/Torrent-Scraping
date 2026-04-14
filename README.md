@@ -1,148 +1,87 @@
-# Torrent Scraper
+# Torrent Scraper for Google Colab & Telegram
 
-A simple torrent scraper using Python
+This repository provides a powerful torrent scraper designed specifically to run inside **Google Colab** and automatically send the results to you via **Telegram**.
 
-Currently scrapes sites: 1337x, ThePirateBay
+It searches for your desired term (e.g., movies or series), filters the results by release year, and combines the found torrents and Magnet Links into a clean `.txt` file, which is then sent directly to your Telegram bot.
 
-## Working Demo
+Supported sites:
+- **ThePirateBay**
+- **1337x**
 
-http://samcloud.tplinkdns.com/torrent
+## Features
+- **Cloudflare Bypass:** Uses `cloudscraper` to bypass 1337x's bot protections.
+- **Direct API:** Uses Apibay for extremely fast PirateBay results.
+- **Year Filtering:** Only returns results that match the year range you specify.
+- **Automated Delivery:** Sends the final list of Magnet links directly to your Telegram.
 
-## API
+---
 
-Get a list of sites:
-```yaml
-/getSites
+## 🚀 How to Use in Google Colab
 
-No Parameters
-```
+The easiest way to use this scraper at scale is through Google Colab.
 
-Search a site for torrents:
-```yaml
-/getTorrents
+### 1. Setup Telegram Bot
+Before you begin, you need a Telegram Bot and your Chat ID:
+1. Open Telegram and search for **@BotFather**.
+2. Send `/newbot` and follow the prompts to create a bot.
+3. Save the **Bot Token** (it looks like `123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11`).
+4. Search for **@userinfobot** in Telegram and send a message to get your **Chat ID** (a number like `123456789`).
+5. Open a chat with your newly created bot and send a message (like "hello") to initiate the conversation.
 
-Parameters:
-{"search_key" : search_key, "site_id" : site_id}
-```
+### 2. Setup Google Colab
+1. Go to [Google Colab](https://colab.research.google.com/) and create a **New Notebook**.
+2. Copy the entire contents of `colab_scraper.py` into a new code cell, or upload the file to your Colab session.
+3. In a **new code cell**, install the required dependencies by running:
+   ```bash
+   !pip install cloudscraper bs4 lxml requests
+   ```
 
-Get magnet link and file list:
-```yaml
-/getTorrentData
+### 3. Run the Scraper
+In another code cell, execute the script with your desired parameters.
 
-Parameters:
-{"link" : link, "site_id" : site_id}
-```
-
-## API Examples and Demos
-### Try these in your browser
-
-Geting list of sites:
-
-http://samcloud.tplinkdns.com:50000/getSites
-
-Returns JSON:
-```yaml
-[
-  {
-    "id": 1,
-    "name": "1337x"
-  },
-  {
-    "id": 2,
-    "name": "ThePirateBay"
-  }
-]
-```
-
-Searching 1337x for Call of duty torrents:
-
-http://samcloud.tplinkdns.com:50000/getTorrents?search_key=god%20of%20war&site_id=1
-
-Returns JSON:
-```yaml
-[
-  {
-    "name": "God of War (v1.0.1/Day 1 Patch/Build 8008283 + Bonus OST, MULTi18) [FitGirl Repack, Selective Download - from 26 GB]",
-    "seeders": 5804,
-    "leechers": 17455,
-    "size": "28.7 GB",
-    "date": 1642185000,
-    "uploader": "FitGirl",
-    "link": "https://1337xx.to/torrent/5114700/God-of-War-v1-0-1-Day-1-Patch-Build-8008283-Bonus-OST-MULTi18-FitGirl-Repack-Selective-Download-from-26-GB/"
-  },
-  {
-    "name": "God of War (2022) MULTi19-ElAmigos",
-    "seeders": 1756,
-    "leechers": 1740,
-    "size": "30.5 GB",
-    "date": 1642185000,
-    "uploader": "BedBug",
-    "link": "https://1337xx.to/torrent/5114679/God-of-War-2022-MULTi19-ElAmigos/"
-  }
-  ...
-]
-```
-
-Geting magnet link and file list from 1337x site:
-
-http://samcloud.tplinkdns.com:50000/getTorrentData?link=https://1337xx.to/torrent/5114679/God-of-War-2022-MULTi19-ElAmigos/&site_id=1
-
-Returns JSON:
-```yaml
-{
-  "magnet": "magnet:?xt=urn:btih:4F515CD16844D3...announce",
-  "files": [
-    "G1odoW6ar-elamigos.part01.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part02.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part03.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part04.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part05.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part06.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part07.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part08.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part09.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part10.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part11.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part12.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part13.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part14.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part15.rar (2.0 GB)",
-    "G1odoW6ar-elamigos.part16.rar (1.2 GB)"
-  ]
-}
-```
-
-## Setting up and running the server
-
-You need Python version 3.x to run this
-
-
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install necessary libraries:
-
-```yaml
-flask, flask-cors, waitress, requests, bs4, lxml, profanity_filter
-
-pip install {package name}
-```
-
-
-Place [blocklist.txt](https://github.com/SameerBidi/Torrent-Scraping/blob/master/API/blocklist.txt) in any location and update the path in [TorrentServer.py](https://github.com/SameerBidi/Torrent-Scraping/blob/master/API/TorrentScraper.py) file
-```python
-with open("path to blocklist.txt", "r") as file:
-```
-This list is used to block adult torrents
-
-
-Run the [torrent_server.py](https://github.com/SameerBidi/Torrent-Scraping/blob/master/API/torrent_server.py) file
+**Example usage:**
 ```bash
-python torrent_server.py
+!python colab_scraper.py \
+  --query "batman" \
+  --start_year 2020 \
+  --end_year 2023 \
+  --pages 3 \
+  --bot_token "YOUR_TELEGRAM_BOT_TOKEN" \
+  --chat_id "YOUR_TELEGRAM_CHAT_ID"
 ```
-By default it runs on 0.0.0.0 (accept requests from everywhere) and port: 50000
 
+*Make sure to replace `"YOUR_TELEGRAM_BOT_TOKEN"` and `"YOUR_TELEGRAM_CHAT_ID"` with the credentials you got in step 1.*
 
-Then access it using 
-```yaml
-http://server-ip:port/api
+---
+
+## 🛠 Parameters List
+
+| Parameter | Required | Description |
+| :--- | :--- | :--- |
+| `--query` | **Yes** | The search term you are looking for (e.g., "The Matrix"). Wrap in quotes if it has spaces. |
+| `--start_year` | **Yes** | The earliest release year to include (e.g., `1999`). |
+| `--end_year` | **Yes** | The latest release year to include (e.g., `2003`). |
+| `--pages` | No | The number of pages to scrape on 1337x (Default is `1`). Increase for larger scale scraping. |
+| `--bot_token` | **Yes** | Your Telegram Bot Token from @BotFather. |
+| `--chat_id` | **Yes** | Your personal Telegram Chat ID. |
+
+---
+
+## Example Output
+
+The bot will send a `.txt` file to your Telegram chat containing data formatted like this:
+
+```
+Title: The Matrix (1999) 1080p BluRay x264
+Year: 1999
+Source: ThePirateBay
+Magnet: magnet:?xt=urn:btih:ABC123DEF456...
+--------------------------------------------------------------------------------
+Title: The Matrix Reloaded (2003) 720p
+Year: 2003
+Source: 1337x
+Magnet: magnet:?xt=urn:btih:DEF456ABC123...
+--------------------------------------------------------------------------------
 ```
 
 ## License
